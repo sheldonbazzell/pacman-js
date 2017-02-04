@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Pacman</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<!-- <script src='script.js'></script> -->
+</head>
+<body>
+<div id="container" style="font-size: 0;">
+	<div id="world"></div>
+	<div id="pacman"></div>
+	<div id="monster"></div>
+</div>
+<div id="score"></div>
+<div id="win"></div>
+<div id="lost"></div>
+<input id="restart" type="button" value="Restart Game" onClick="window.location.reload()">
+</body>
+<script>
+
+var world = [
+	[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+	[2,0,1,1,2,1,1,1,1,1,1,1,1,1,2],
+	[2,1,2,1,1,1,2,2,2,1,2,1,2,1,2],
+	[2,1,2,1,2,2,2,2,2,2,2,1,2,1,2],
+	[2,1,2,1,2,0,0,0,2,1,2,1,2,1,2],
+	[2,1,2,1,2,2,0,2,2,1,2,1,2,1,2],
+	[2,1,2,1,1,1,1,1,1,1,1,1,2,1,2],
+	[2,1,2,2,2,2,2,2,2,2,2,1,2,1,2],
+	[2,1,1,2,1,1,1,1,1,1,1,1,2,1,2],
+	[2,1,2,2,2,2,2,2,2,2,2,1,2,1,2],
+	[2,1,1,1,1,1,1,1,1,1,1,1,1,1,2],
+	[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
+];
+
+var pacman = {
+	x: 1,
+	y: 1
+};
+
+var visited = {x:[],y:[]};
+var countVert;
+
+function Monster() {
+	this.x = 6;
+	this.y = 4;
+	this.displayMonster = function() {
+		document.getElementById('monster').style.top = this.y*20+"px"
+		document.getElementById('monster').style.left = this.x*20+"px"
+		document.getElementById('monster').style.display = "block";
+	}
+	this.move = function() {
+		if(world[this.y+1][this.x] != 2) {
+			this.y++;
+		} else if(world[this.y][this.x-1] != 2) {
+			this.x--;
+		} else if(world[this.y-1][this.x] != 2) {
+			this.y--;
+		} else if(world[this.y][this.x+1] != 2) {
+			this.x++;
+		}
+	// 	if(world[this.y+1][this.x] != 2) {
+	// 		countVert = 0;
+	// 		for(var key in visited.y) {
+	// 			if(visited[y] == this.y+1) {
+	// 				countVert++;
+	// 			}
+	// 		}
+	// 		for(var idx in visited.x) {
+	// 			if(visited.x == this.x) {
+	// 				countVert++;
+	// 			}
+	// 		}
+	// 		if(countVert < 2) {
+	// 			visited.y.push(this.y+1);
+	// 			this.y++;
+	// 		}
+	// 	}
+	// 	else if(world[this.y][this.x-1] != 2) {
+	// 		countVert = 0;
+	// 		for(var key in visited.x) {
+	// 			if(visited.x == this.x-1) {
+	// 				countVert++;
+	// 			}
+	// 		}
+	// 		for(var idx in visited.y) {
+	// 			if(visited[y] == this.y) {
+	// 				countVert++;
+	// 			}
+	// 		}
+	// 		if(countVert < 2) {
+	// 			visited[x].push(this.x-1);
+	// 			this.x--;
+	// 		}
+	// 	}
+	// 	else if(world[this.y-1][this.x] != 2) {
+	// 		countVert = 0;
+	// 		for(var key in visited.y) {
+	// 			if(visited.y == this.y-1) {
+	// 				countVert++;
+	// 			}
+	// 		}
+	// 		for(var idx in visited.x) {
+	// 			if(visited.x == this.x) {
+	// 				countVert++;
+	// 			}
+	// 		}
+	// 		if(countVert < 2) {
+	// 			visitedy.push(this.y-1);
+	// 			this.y--;
+	// 		}
+	// 	} 
+	// 	else if(world[this.y][this.x+1] != 2) {
+	// 		countVert = 0;
+	// 		for(var key in visited.x) {
+	// 			if(visited[x] == this.x+1) {
+	// 				countVert++;
+	// 			}
+	// 		}
+	// 		for(var idx in visited.y) {
+	// 			if(visited[y] == this.y) {
+	// 				countVert++;
+	// 			}
+	// 		}
+	// 		if(countVert < 2) {
+	// 			visited[x].push(this.x+1);
+	// 			this.x++;
+	// 		}
+	// 	}
+		this.displayMonster();
+	}
+
+}
+
+Monster.prototype.eat = function(x,y) {
+	if(this.x == x && this.y == y) {
+		clearInterval(moveGhost);
+		document.getElementById('lost').innerHTML = 'You lost';
+	}
+}
+var firstM = new Monster();
+
+function firstMonster() {
+	document.getElementById('monster').style.top = firstM.y*20 + "px";
+	document.getElementById('monster').style.left = firstM.x*20 + "px";
+	document.getElementById('monster').style.display = "block";
+	setInterval(function(){
+		firstM.eat(pacman.x, pacman.y);
+	}, 500);
+}
+firstMonster();
+
+var moveGhost = setInterval(function(){firstM.move()},1000);
+
+function displayWorld() {
+	var output = '';
+	for(var idx in world) {
+		output += "\n<div class='row'>\n"
+		for(var jdx in world[idx]) {
+			if(world[idx][jdx] == 2) {
+				output += "<div class='brick'></div>"
+			} else if(world[idx][jdx] == 1) {
+				output += "<div class='coin'></div>"
+			} else {
+				output += "<div class='empty'></div>"
+			}
+		}
+		output += "\n</div>"
+	}
+	document.getElementById('world').innerHTML = output;
+}
+
+var count = 0;
+function countCoins() {
+	for(var idx in world) {
+		for(var jdx in world[idx]) {
+			if(world[idx][jdx] == 1) {
+				count++;
+			}
+		}
+	}
+}
+countCoins();
+
+function displayPacman() {
+	document.getElementById('pacman').style.top = pacman.y*20+"px"
+	document.getElementById('pacman').style.left = pacman.x*20+"px"
+}
+
+// function displayMonster() {
+// 	console.log(monster.x);
+// 	document.getElementById('monster').style.top = monster.y*20+"px"
+// 	document.getElementById('monster').style.left = monster.x*20+"px"
+// 	document.getElementById('monster').style.display = "block";
+// }
+
+var score = 0
+
+function displayScore() {
+	document.getElementById('score').innerHTML = score;
+}
+
+displayWorld();
+displayPacman();
+displayScore();
+// displayMonster();
+
+document.onkeydown = function(e) {
+	console.log(e.keyCode);
+	if(e.keyCode == 37) {
+		if(world[pacman.y][pacman.x-1] != 2) {
+			pacman.x--;
+		}
+	}
+	else if(e.keyCode == 39) {
+		if(world[pacman.y][pacman.x+1] != 2) {
+			pacman.x++;
+		}
+	}
+	else if(e.keyCode == 38) {
+		if(world[pacman.y-1][pacman.x] !== 2) {
+			pacman.y--;
+		}
+	}
+	else if(e.keyCode == 40) {
+		if(world[pacman.y+1][pacman.x] !== 2) {
+			pacman.y++;
+		}
+	}
+
+	if(world[pacman.y][pacman.x] == 1) {
+		world[pacman.y][pacman.x] = 0;
+		score +=10;
+		count--;
+		displayWorld();
+		displayScore();
+		if(count == 0) {
+			document.getElementById('win').innerHTML = 'YOU WON!!'
+		}
+	}
+	displayPacman();
+}
+
+// document.onkeydown = function(e) {
+// 	console.log(e.keyCode);
+// 	if(e.keyCode == 37) {
+// 		if(world[firstM.y][firstM.x-1] != 2) {
+// 			firstM.x--;
+// 		}
+// 	}
+// 	else if(e.keyCode == 39) {
+// 		if(world[firstM.y][firstM.x+1] != 2) {
+// 			firstM.x++;
+// 		}
+// 	}
+// 	else if(e.keyCode == 38) {
+// 		if(world[firstM.y-1][firstM.x] !== 2) {
+// 			firstM.y--;
+// 		}
+// 	}
+// 	else if(e.keyCode == 40) {
+// 		if(world[firstM.y+1][firstM.x] !== 2) {
+// 			firstM.y++;
+// 		}
+// 	}
+
+// 	if(world[firstM.y][firstM.x] == 1) {
+// 		world[firstM.y][firstM.x] = 0;
+// 		score +=10;
+// 		count--;
+// 		displayWorld();
+// 		displayScore();
+// 		if(count == 0) {
+// 			document.getElementById('win').innerHTML = 'YOU WON!!'
+// 		}
+// 	}
+// 	firstM.displayMonster();
+// }
+
+
+</script>
+</html>
