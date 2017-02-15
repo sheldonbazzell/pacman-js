@@ -29,7 +29,7 @@ div#pacman {
 	position: absolute;
 }
 
-div#monster {
+div#ghost {
 	background: url('images/monster.png');
 	display: none;
 	background-size: cover;
